@@ -141,3 +141,9 @@ tbody td {
 tbody td:not(:first-child) {
   text-align: right;
 }
+
+.tabuadabody.negativo{
+  color: #fff;
+  background-color: #ff0000;
+  border-color: #da0f0f
+}
