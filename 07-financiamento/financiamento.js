@@ -2,30 +2,54 @@
 // Simulador de Financiamento
 'use strict';
 
-function calcularFinanciamento() {
+function simularFinanciamento() {
   const valorInput = document.getElementById('valor');
+  const taxaInput = document.getElementById('taxa');
   const parcelasInput = document.getElementById('parcelas');
-  const resultadoDiv = document.getElementById('resultado');
-    const valor = Number(valorInput.value);
-    const parcelas = Number(parcelasInput.value);
+  const financiamentoBody = document.getElementById('financiamentoBody');
 
-  if (Number.isNaN(valor) || Number.isNaN(parcelas)) {
-    alert('Digite valores válidos para o valor e o número de parcelas.');
+  const valor = Number(valorInput.value);
+  const taxa = Number(taxaInput.value);
+  const parcelas = Number(parcelasInput.value);
+
+  // Validação
+  if (Number.isNaN(valor) || Number.isNaN(taxa) || Number.isNaN(parcelas)) {
+    alert('Digite valores válidos para todos os campos.');
     return;
   }
 
-    if (valor <= 0 || parcelas <= 0) {
-    alert('O valor e o número de parcelas devem ser maiores que zero.');
+  if (valor <= 0 || taxa < 0 || parcelas <= 0) {
+    alert('O valor e número de parcelas devem ser maiores que zero.');
     return;
   }
 
-    const taxaJuros = 0.01; // Taxa de juros mensal (1%)
-    const valorParcela = (valor * taxaJuros) / (1 - Math.pow(1 + taxaJuros, -parcelas));
-    const valorTotal = valorParcela * parcelas;
-    resultadoDiv.textContent = `Valor da Parcela: R$ ${valorParcela.toFixed(2)} | Valor Total: R$ ${valorTotal.toFixed(2)}`;
+  // Limpar tabela anterior
+  financiamentoBody.innerHTML = '';
+
+  // Calcular parcela fixa
+  const valorParcela = valor / parcelas;
+  let saldoDevedor = valor;
+
+  // Simular mês a mês
+  for (let mes = 1; mes <= parcelas; mes += 1) {
+    const jurosDoMes = saldoDevedor * (taxa / 100);
+    const totalDoMes = valorParcela + jurosDoMes;
+    saldoDevedor -= valorParcela;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${mes}</td>
+      <td class="col-parcela">R$ ${valorParcela.toFixed(2)}</td>
+      <td class="col-juros">R$ ${jurosDoMes.toFixed(2)}</td>
+      <td class="col-total">R$ ${totalDoMes.toFixed(2)}</td>
+      <td class="col-saldo">R$ ${Math.max(0, saldoDevedor).toFixed(2)}</td>
+    `;
+
+    financiamentoBody.appendChild(tr);
+  }
 }
 
-const botaoCalcular = document.getElementById('calcular');
-if (botaoCalcular) {
-  botaoCalcular.addEventListener('click', calcularFinanciamento);
+const botaoSimular = document.getElementById('simular');
+if (botaoSimular) {
+  botaoSimular.addEventListener('click', simularFinanciamento);
 }
